@@ -1,0 +1,7 @@
+.idea
+node_modules
+#personal dev stuff
+info
+
+tests/utils/expect
+tests/expect_tests

@@ -1,0 +1,26 @@
+{
+  "name": "lock-service-redis",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "start:dev": "nodemon index.js",
+    "test": "jest grpcHealth.test.js && jest pollLock.test.js && npx jest"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@grpc/grpc-js": "^1.8.13",
+    "@grpc/proto-loader": "^0.7.6",
+    "grpc-node-server-reflection": "^1.0.2",
+    "ioredis": "^5.3.1",
+    "yarn": "^1.22.19"
+  },
+  "devDependencies": {
+    "jest": "^29.5.0",
+    "nodemon": "^2.0.22",
+    "uuid": "^9.0.0"
+  }
+}

@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package lockService;
+
+service LockService {
+  rpc AcquireLock (LockRequest) returns (LockResponse) {}
+  rpc ReleaseLock (LockRequest) returns (LockResponse) {}
+  rpc ExtendLock (LockRequest) returns (LockResponse) {}
+  rpc PersistLock (LockRequest) returns (LockResponse) {}
+  rpc PollLock (LockRequest) returns (PollResponse) {}
+  rpc EnsureLock (LockRequest) returns (LockResponse) {}
+}
+
+message LockRequest {
+  // Lock owner
+  string owner = 1;
+  // Lock record ID
+  string ticket = 2;
+  // Lock lifetime
+  int32 lifetime = 10;
+}
+
+message LockResponse {
+  // Error will return 1, if successful then 0
+  bool isError = 3;
+  // Request info
+  LockRequest lock = 6;
+  // Time request
+  int32 timeSpent = 17;
+  // Additional message
+  string message = 20;
+}
+
+message PollResponse {
+  bool isBlocked = 1;
+  // Error will return 1, if successful then 0.
+  bool isError = 3;
+  // Request info
+  LockRequest lock = 6;
+  // Time request
+  int32 timeSpent = 17;
+  // Additional message
+}
