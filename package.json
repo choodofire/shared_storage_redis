@@ -8,7 +8,7 @@
     "start:dev": "nodemon index.js",
     "test": "jest grpcHealth.test.js && jest pollLock.test.js && npx jest"
   },
-  "author": "",
+  "author": "Vyacheslav Gordeev",
   "license": "ISC",
   "description": "",
   "dependencies": {
@@ -16,6 +16,7 @@
     "@grpc/proto-loader": "^0.7.6",
     "grpc-node-server-reflection": "^1.0.2",
     "ioredis": "^5.3.1",
+    "winston": "^3.8.2",
     "yarn": "^1.22.19"
   },
   "devDependencies": {

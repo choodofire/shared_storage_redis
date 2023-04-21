@@ -1,4 +1,5 @@
 import { getRedisClient } from '../../redis/redis-client.js';
+import eventLogger from "../../monitoring/eventLogger.js";
 
 const redisClient = getRedisClient();
 
@@ -43,8 +44,12 @@ export function acquireLock(call, callback) {
                 }
             });
         });
-    } catch (e) {
-        console.log('acquireLock Error');
-        console.error(e.stack);
+    } catch (err) {
+        console.log('acquireLock Error', err);
+        eventLogger('error', {
+            message: err.message,
+            stack: err.stack,
+            caughtAt: 'acquireLock',
+        });
     }
 }

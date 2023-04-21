@@ -1,4 +1,5 @@
 import { getRedisClient } from '../../redis/redis-client.js';
+import eventLogger from "../../monitoring/eventLogger.js";
 
 const redisClient = getRedisClient();
 
@@ -19,7 +20,6 @@ export function persistLock(call, callback) {
                     lock: call.request,
                     timeSpent,
                     message: 'Record is already blocked' });
-                return;
             }
 
             // Trying to set up persist lock
@@ -43,8 +43,12 @@ export function persistLock(call, callback) {
                 }
             });
         });
-    } catch (e) {
-        console.error('persistLock Error');
-        console.error(e.stack);
+    } catch (err) {
+        console.log('persistLock Error', err);
+        eventLogger('error', {
+            message: err.message,
+            stack: err.stack,
+            caughtAt: 'persistLock',
+        });
     }
 }

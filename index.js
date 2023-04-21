@@ -4,6 +4,7 @@ import grpc from '@grpc/grpc-js';
 import protoLoader from '@grpc/proto-loader';
 import wrapServerWithReflection from 'grpc-node-server-reflection';
 import {acquireLock, releaseLock, extendLock, persistLock, pollLock, ensureLock} from './handlers/handlers.js';
+import eventLogger from "./monitoring/eventLogger.js";
 
 const PORT = process.env.PORT || 50051;
 const __filename = fileURLToPath(import.meta.url);
@@ -34,6 +35,11 @@ async function bootstrap() {
             (err, port) => {
                 if (err) {
                     console.error(`Failed to start gRPC server: ${err}`);
+                    eventLogger('error', {
+                        message: err.message,
+                        stack: err.stack,
+                        caughtAt: 'start gRPC server',
+                    });
                     return;
                 }
 
@@ -43,8 +49,12 @@ async function bootstrap() {
         );
 
     } catch (e) {
-        console.error('Server start error');
-        console.error(e.stack);
+        console.error('Server start error', e.stack);
+        eventLogger('error', {
+            message: e.message,
+            stack: e.stack,
+            caughtAt: 'grpc Client Start',
+        });
     }
 }
 

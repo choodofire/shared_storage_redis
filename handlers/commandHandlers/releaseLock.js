@@ -1,4 +1,5 @@
 import { getRedisClient } from '../../redis/redis-client.js';
+import eventLogger from "../../monitoring/eventLogger.js";
 
 const redisClient = getRedisClient();
 
@@ -18,7 +19,6 @@ export function releaseLock(call, callback) {
                     lock: call.request,
                     timeSpent,
                     message: 'Record is not blocked' });
-                return;
             }
 
             const ticketInfo = JSON.parse(result);
@@ -31,7 +31,6 @@ export function releaseLock(call, callback) {
                     lock: call.request,
                     timeSpent,
                     message: 'You are not owner' });
-                return;
             }
 
             // Unblock if record is locked
@@ -55,9 +54,12 @@ export function releaseLock(call, callback) {
                 }
             });
         });
-    } catch (e) {
-        console.error('releaseLock Error');
-        console.error(e.stack);
+    } catch (err) {
+        console.log('releaseLock Error', err);
+        eventLogger('error', {
+            message: err.message,
+            stack: err.stack,
+            caughtAt: 'releaseLock',
+        });
     }
-
 }
