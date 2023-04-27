@@ -3,14 +3,22 @@ import {fileURLToPath} from 'url';
 import grpc from '@grpc/grpc-js';
 import protoLoader from '@grpc/proto-loader';
 import wrapServerWithReflection from 'grpc-node-server-reflection';
-import {acquireLock, releaseLock, extendLock, persistLock, pollLock, ensureLock} from './handlers/handlers.js';
-import eventLogger from "./monitoring/eventLogger.js";
+import {
+    acquireLock,
+    releaseLock,
+    extendLock,
+    persistLock,
+    pollLock,
+    ensureLock,
+    pollLockList,
+    pollLockStreaming
+} from './handlers/handlers.js';
 
 const PORT = process.env.PORT || 50051;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const PROTO_PATH = path.resolve(__dirname, "./protos/shared_storage.proto");
+const PROTO_PATH = path.resolve(__dirname, "./protos/locker.proto");
 const packageDefinition = protoLoader.loadSync(PROTO_PATH);
 const lockService = grpc.loadPackageDefinition(packageDefinition).lockService;
 
@@ -26,6 +34,8 @@ async function bootstrap() {
             ExtendLock: extendLock,
             PersistLock: persistLock,
             PollLock: pollLock,
+            PollLockList: pollLockList,
+            PollLockStreaming: pollLockStreaming,
             EnsureLock: ensureLock,
         });
 
@@ -35,11 +45,6 @@ async function bootstrap() {
             (err, port) => {
                 if (err) {
                     console.error(`Failed to start gRPC server: ${err}`);
-                    eventLogger('error', {
-                        message: err.message,
-                        stack: err.stack,
-                        caughtAt: 'start gRPC server',
-                    });
                     return;
                 }
 
@@ -49,12 +54,8 @@ async function bootstrap() {
         );
 
     } catch (e) {
-        console.error('Server start error', e.stack);
-        eventLogger('error', {
-            message: e.message,
-            stack: e.stack,
-            caughtAt: 'grpc Client Start',
-        });
+        console.error('Server start error');
+        console.error(e.stack);
     }
 }
 

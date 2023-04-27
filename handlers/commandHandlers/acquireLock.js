@@ -1,5 +1,4 @@
 import { getRedisClient } from '../../redis/redis-client.js';
-import eventLogger from "../../monitoring/eventLogger.js";
 
 const redisClient = getRedisClient();
 
@@ -8,7 +7,7 @@ export function acquireLock(call, callback) {
         const start = Date.now();
 
         const { ticket, ...values } = call.request;
-        const { lifetime } = values;
+        const { lifetime } = values || 0;
 
         // Check record is locked
         redisClient.get(ticket, (err, result) => {
@@ -44,12 +43,8 @@ export function acquireLock(call, callback) {
                 }
             });
         });
-    } catch (err) {
-        console.log('acquireLock Error', err);
-        eventLogger('error', {
-            message: err.message,
-            stack: err.stack,
-            caughtAt: 'acquireLock',
-        });
+    } catch (e) {
+        console.log('acquireLock Error');
+        console.error(e.stack);
     }
 }

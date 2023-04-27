@@ -1,5 +1,4 @@
 import { getRedisClient } from '../../redis/redis-client.js';
-import eventLogger from "../../monitoring/eventLogger.js";
 
 const redisClient = getRedisClient();
 
@@ -8,7 +7,8 @@ export function ensureLock(call, callback) {
         const start = Date.now();
 
         const { ticket, ...values } = call.request;
-        const { lifetime, owner } = values;
+        const { owner } = values;
+        const { lifetime } = values || 0;
 
         // Check record is locked
         redisClient.get(ticket, (err, result) => {
@@ -24,7 +24,9 @@ export function ensureLock(call, callback) {
                         lock: call.request,
                         timeSpent,
                         message: 'Record is already blocked by another owner' });
+                    return;
                 }
+
                 // Trying to set up lock with same owner
                 redisClient.set(ticket, JSON.stringify(values), 'PX', lifetime, (err, result) => {
 
@@ -64,12 +66,8 @@ export function ensureLock(call, callback) {
                 });
             }
         });
-    } catch (err) {
-        console.log('ensureLock Error', err);
-        eventLogger('error', {
-            message: err.message,
-            stack: err.stack,
-            caughtAt: 'ensureLock',
-        });
+    } catch (e) {
+        console.log('ensureLock Error');
+        console.error(e.stack);
     }
 }

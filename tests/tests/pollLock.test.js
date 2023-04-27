@@ -34,13 +34,13 @@ describe('pollLock test', () => {
         const acquireLockResponse = await acquireLock(req, client);
         expect(acquireLockResponse.isError).toBeFalsy();
 
-        const pollLockResponseFirst = await pollLock(req, client);
-        expect(pollLockResponseFirst.isBlocked).toBeTruthy();
+        const pollLockResponse1 = await pollLock(req, client);
+        expect(pollLockResponse1.isBlocked).toBeTruthy();
 
         const releaseLockResponse = await releaseLock(req, client);
         expect(releaseLockResponse.isError).toBeFalsy();
 
-        const pollLockResponseSecond = await pollLock(req, client);
-        expect(pollLockResponseSecond.isBlocked).toBeFalsy();
+        const pollLockResponse2 = await pollLock(req, client);
+        expect(pollLockResponse2.isBlocked).toBeFalsy();
     });
 });

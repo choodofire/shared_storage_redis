@@ -8,6 +8,8 @@ service LockService {
   rpc ExtendLock (LockRequest) returns (LockResponse) {}
   rpc PersistLock (LockRequest) returns (LockResponse) {}
   rpc PollLock (LockRequest) returns (PollResponse) {}
+  rpc PollLockStreaming (stream LockRequest) returns (stream PollResponse) {}
+  rpc PollLockList (LockRequestList) returns (PollResponseList) {}
   rpc EnsureLock (LockRequest) returns (LockResponse) {}
 }
 
@@ -18,6 +20,11 @@ message LockRequest {
   string ticket = 2;
   // Lock lifetime
   int32 lifetime = 10;
+}
+
+message LockRequestList {
+  // ArrayList of LockRequest
+  repeated LockRequest requests = 1;
 }
 
 message LockResponse {
@@ -31,6 +38,11 @@ message LockResponse {
   string message = 20;
 }
 
+message LockResponseList {
+  // ArrayList of LockResponse
+  repeated LockResponse responses = 1;
+}
+
 message PollResponse {
   bool isBlocked = 1;
   // Error will return 1, if successful then 0.
@@ -39,5 +51,9 @@ message PollResponse {
   LockRequest lock = 6;
   // Time request
   int32 timeSpent = 17;
-  // Additional message
+}
+
+message PollResponseList {
+  // ArrayList of PollResponse
+  repeated PollResponse responses = 1;
 }

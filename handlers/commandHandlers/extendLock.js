@@ -1,5 +1,4 @@
 import { getRedisClient } from '../../redis/redis-client.js';
-import eventLogger from "../../monitoring/eventLogger.js";
 
 const redisClient = getRedisClient();
 
@@ -7,7 +6,8 @@ export function extendLock(call, callback) {
     try {
         const start = Date.now();
 
-        const { ticket, owner, lifetime } = call.request;
+        const { ticket, owner } = call.request;
+        const { lifetime } = call.request || 0;
 
         // Check record is locked
         redisClient.get(ticket, (err, result) => {
@@ -19,6 +19,7 @@ export function extendLock(call, callback) {
                     lock: call.request,
                     timeSpent,
                     message: 'Record is not blocked' });
+                return;
             }
 
             const ticketInfo = JSON.parse(result);
@@ -31,6 +32,7 @@ export function extendLock(call, callback) {
                     lock: call.request,
                     timeSpent,
                     message: 'You are not owner' });
+                return;
             }
 
             // Change lifetime
@@ -44,18 +46,19 @@ export function extendLock(call, callback) {
                         timeSpent,
                         message: 'Lifetime set successfully' });
                 } else {
-                    console.log('Im in recursion')
-                    extendLock(call, callback)
+                    const timeSpent = Date.now() - start;
+
+                    callback(null, {
+                        isError: true,
+                        lock: call.request,
+                        timeSpent,
+                        message: 'Extend error' });
                 }
             });
         });
-    } catch (err) {
-        console.log('extendLock Error', err);
-        eventLogger('error', {
-            message: err.message,
-            stack: err.stack,
-            caughtAt: 'extendLock',
-        });
+    } catch (e) {
+        console.error('extendLock Error');
+        console.error(e.stack);
     }
     
 
