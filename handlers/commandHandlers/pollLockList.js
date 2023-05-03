@@ -8,11 +8,17 @@ export function pollLockList(call, callback) {
         const pollRequests = call.request.requests;
 
         const responses = [];
+        let isBlockedAll = false;
 
         pollRequests.forEach(pollRequest => {
             // Check if record is locked
             redisClient.get(pollRequest.ticket, (err, result) => {
                 const isBlocked = Boolean(result);
+
+                if (isBlocked) {
+                    isBlockedAll = true;
+                }
+
                 const timeSpent = Date.now() - start;
 
                 const response = {
@@ -24,7 +30,7 @@ export function pollLockList(call, callback) {
                 responses.push(response);
 
                 if (responses.length === pollRequests.length) {
-                    callback(null, { responses });
+                    callback(null, { responses, isBlocked: isBlockedAll });
                 }
             });
         });

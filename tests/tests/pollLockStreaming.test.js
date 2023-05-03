@@ -51,4 +51,35 @@ describe('pollLockStreaming test', () => {
         expect(response.isBlocked).toBeFalsy();
     });
 
+    it('pollLockStreaming with locked ticket', async () => {
+        const acquireLockResponse = await acquireLock(req, client);
+        expect(acquireLockResponse.isError).toBeFalsy();
+
+        stream.write(req);
+
+        await new Promise(resolve => {
+            stream.on('data', response => {
+                // Check that ticket is blocked
+                expect(response.isBlocked).toBeTruthy();
+                resolve();
+            });
+        });
+
+        // release Lock
+        const releaseLockResponse =  await releaseLock(req, client);
+        expect(releaseLockResponse.isError).toBeFalsy();
+
+        stream.end();
+        stream = pollLockStreaming(client);
+
+        stream.write(req);
+
+        await new Promise(resolve => {
+            stream.on('data', response => {
+                // Check that ticket is not blocked after release
+                expect(response.isBlocked).toBeFalsy();
+                resolve();
+            });
+        });
+    });
 });

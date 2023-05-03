@@ -56,4 +56,7 @@ message PollResponse {
 message PollResponseList {
   // ArrayList of PollResponse
   repeated PollResponse responses = 1;
+  // Result of whole poll list
+  bool isBlocked = 3;
 }
+

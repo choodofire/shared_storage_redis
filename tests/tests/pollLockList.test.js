@@ -28,6 +28,7 @@ describe('pollLockList test', () => {
 
     it('pollLockList with empty tickets', async () => {
         const pollLockListResponse = await pollLockList(req, client);
+        expect(pollLockListResponse.isBlocked).toBeFalsy();
         pollLockListResponse.responses.forEach((response) => {
             expect(response.isBlocked).toBeFalsy();
         });
@@ -41,6 +42,7 @@ describe('pollLockList test', () => {
         expect(acquireLockResponse.isError).toBeFalsy();
 
         const pollLockListResponse1 = await pollLockList(req, client);
+        expect(pollLockListResponse1.isBlocked).toBeTruthy();
         pollLockListResponse1.responses.forEach((response, index) => {
             +index === +acquire_number ?
                 expect(response.isBlocked).toBeTruthy() : expect(response.isBlocked).toBeFalsy();
@@ -50,8 +52,10 @@ describe('pollLockList test', () => {
         expect(releaseLockResponse.isError).toBeFalsy();
 
         const pollLockListResponse2 = await pollLockList(req, client);
+        expect(pollLockListResponse2.isBlocked).toBeFalsy();
         pollLockListResponse2.responses.forEach((response) => {
             expect(response.isBlocked).toBeFalsy();
         });
     });
+
 });
