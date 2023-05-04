@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node index.js",
     "start:dev": "nodemon index.js",
-    "test": "jest grpcHealth.test.js && jest pollLock.test.js && npx jest"
+    "test": "jest grpcHealth.test.js && jest pollLock.test.js && npx jest --detectOpenHandles --forceExit"
   },
   "author": "Vyacheslav Gordeev",
   "license": "ISC",
