@@ -17,7 +17,7 @@ jobs:
       - name: Set up environment
         run: docker-compose -f docker-compose-storage-only.yml up -d
       - name: Wait for docker to finish building
-        run: sleep 30
+        run: sleep 10
       - name: install modules
         run: npm install
       - name: start project

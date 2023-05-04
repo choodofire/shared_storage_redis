@@ -21,14 +21,18 @@ describe('pollLockStreaming test', () => {
         stream = pollLockStreaming(client);
 
         stream.on('end', () => {
-            stream.end();
+            console.log('Stream ended');
+        });
+
+        stream.on('error', err => {
+            console.error('Error occurred:', err);
         });
     });
 
     afterEach(() => {
         // Close the server connection after each test
         try{
-            stream.cancel();
+            stream.end();
             client.close();
         }catch(_e){}
     });
