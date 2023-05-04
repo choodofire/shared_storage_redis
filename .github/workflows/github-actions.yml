@@ -21,6 +21,8 @@ jobs:
       - name: install modules
         run: npm install
       - name: start project
-        run: npm start &
+        run: npm start
+        if: steps.start-project.outcome == 'success'
       - name: test project
         run: npm test
+        if: steps.test-project.outcome == 'success'
